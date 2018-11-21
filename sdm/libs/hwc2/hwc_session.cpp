@@ -159,7 +159,29 @@ int HWCSession::Init() {
 
   g_hwc_uevent_.Register(this);
 
-  InitSupportedDisplaySlots();
+#ifdef USE_GRALLOC1
+  DisplayError grerr = buffer_allocator_.Init();
+  if (grerr != kErrorNone) {
+    ALOGE("%s::%s: Buffer allocaor initialization failed. Error = %d",
+          __CLASS__, __FUNCTION__, grerr);
+    return -EINVAL;
+  }
+#endif
+
+  auto error = CoreInterface::CreateCore(&buffer_allocator_, &buffer_sync_handler_,
+                                    &socket_handler_, &core_intf_);
+  if (error == kErrorNoDevice) {
+    CreateNullDisplay();
+    primary_ready_ = true;
+    is_composer_up_ = true;
+    DLOGI("NULL display created!");
+    return 0;
+  } else if (error != kErrorNone) {
+    DLOGE("Display core initialization failed. Error = %d", error);
+    Deinit();
+    return -EINVAL;
+  }
+
   // Create primary display here. Remaining builtin displays will be created after client has set
   // display indexes which may happen sometime before callback is registered.
   status = CreatePrimaryDisplay();
@@ -195,6 +217,10 @@ int HWCSession::Deinit() {
 
   g_hwc_uevent_.Register(nullptr);
   CoreInterface::DestroyCore();
+
+#ifdef USE_GRALLOC1
+    buffer_allocator_.Deinit();
+#endif
 
   return 0;
 }
