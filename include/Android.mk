@@ -15,4 +15,11 @@ LOCAL_COPY_HEADERS            := display_properties.h \
                                  ../libqservice/IQService.h \
                                  ../libqservice/IQHDMIClient.h \
                                  ../libqservice/IQClient.h
+
+ifeq ($(TARGET_USES_GRALLOC1),true)
+LOCAL_EXPORT_C_INCLUDE_DIRS += $(display_top)/gralloc1
+else
+LOCAL_EXPORT_C_INCLUDE_DIRS += $(display_top)/gralloc
+endif
+
 include $(BUILD_COPY_HEADERS)
