@@ -108,4 +108,6 @@
 #define WINDOW_RECT_PROP                     DISPLAY_PROP("window_rect")
 #define ENABLE_DROP_REFRESH                  DISPLAY_PROP("enable_drop_refresh")
 
+#define SKIP_EXTENSION_INTF                  DISPLAY_PROP("skip_extension_intf")
+
 #endif  // __DISPLAY_PROPERTIES_H__
